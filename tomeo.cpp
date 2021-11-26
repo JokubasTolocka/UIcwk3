@@ -47,7 +47,7 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 
             QString thumb = f.left( f .length() - 4) +".png";
             if (QFile(thumb).exists()) { // if a png thumbnail exists
-                // Adding this comment to check the Pull Request feature
+                // Adding this comment to check the Pull Request feat
                 QImageReader *imageReader = new QImageReader(thumb);
                     QImage sprite = imageReader->read(); // read the thumbnail
                     if (!sprite.isNull()) {
