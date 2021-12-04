@@ -9,13 +9,16 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <QApplication>
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QMediaPlaylist>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QHBoxLayout>
+#include <QTextEdit>
 #include <QtCore/QFileInfo>
 #include <QtWidgets/QFileIconProvider>
 #include <QDesktopServices>
@@ -25,6 +28,10 @@
 #include <QtCore/QDirIterator>
 #include "the_player.h"
 #include "the_button.h"
+using std::cout; using std::cerr;
+using std::endl; using std::string;
+using std::ifstream; using std::ostringstream;
+using std::istringstream;
 
 // read in videos and thumbnails to this directory
 std::vector<TheButtonInfo> getInfoIn (std::string loc) {
@@ -66,6 +73,15 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
     return out;
 }
 
+string readFileIntoString(const string& path) {
+    ifstream input_file(path);
+    if (!input_file.is_open()) {
+        cerr << "Could not open the file - '"
+             << path << "'" << endl;
+        exit(EXIT_FAILURE);
+    }
+    return string((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
+}
 
 int main(int argc, char *argv[]) {
 
@@ -74,6 +90,27 @@ int main(int argc, char *argv[]) {
 
     // create the Qt Application
     QApplication app(argc, argv);
+
+    string filename("C:\\Users\\miada\\OneDrive\\Documents\\Uni Work\\Year2\\Sem1\\UserInterfaces2811\\metadata.csv");
+    string file_contents;
+
+//    std::map<int, std::vector<string>> csv_contents;
+//    char delimiter = ',';
+
+//    file_contents = readFileIntoString(filename);
+//    cout << "file contents: " << file_contents << endl;
+
+    //convert to Qstring for use in TextEdit
+//    QString qstr = QString::fromStdString(file_contents);
+
+//    istringstream sstream(file_contents);
+//    //vector of strings
+//    std::vector<string> items;
+//    string line1 = "gopro cycling in the alps, mountains";
+//    string line2 = "panda sanctuary in china, beijing";
+//    items.push_back(line1);
+//    items.push_back(line2);
+
 
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
@@ -101,6 +138,11 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
+    //widget for text beneath player
+    QTextEdit *description = new QTextEdit;
+//    description->setText(qstr);
+    description->setReadOnly(true);
+
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
 
@@ -112,34 +154,43 @@ int main(int argc, char *argv[]) {
     QWidget *buttonWidget = new QWidget();
     // a list of the buttons
     std::vector<TheButton*> buttons;
-    // the buttons are arranged horizontally
-    QHBoxLayout *layout = new QHBoxLayout();
-    buttonWidget->setLayout(layout);
+    // the buttons are arranged **vertically
+    QVBoxLayout *thumbnailLayout = new QVBoxLayout();
+    buttonWidget->setLayout(thumbnailLayout);
 
 
-    // create the four buttons
-    for ( int i = 0; i < 4; i++ ) {
+    // create the buttons
+    for ( int i = 0; i < 7; i++ ) {
         TheButton *button = new TheButton(buttonWidget);
         button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
+        //button->connect(button, SIGNAL(clicked()), description, SLOT(setPlainText(items[i])()));
+        //^this should work, its breaking somewhere else
         buttons.push_back(button);
-        layout->addWidget(button);
+        thumbnailLayout->addWidget(button);
         button->init(&videos.at(i));
     }
+
+    //right hand side, player and text
+    QVBoxLayout *playerLayout = new QVBoxLayout();
+    playerLayout->addWidget(videoWidget);
+    playerLayout->addWidget(description);
+
 
     // tell the player what buttons and videos are available
     player->setContent(&buttons, & videos);
 
     // create the main window and layout
     QWidget window;
-    QVBoxLayout *top = new QVBoxLayout();
-    window.setLayout(top);
+    QHBoxLayout *view = new QHBoxLayout();
+
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
     // add the video and the buttons to the top level widget
-    top->addWidget(videoWidget);
-    top->addWidget(buttonWidget);
+    view->addWidget(buttonWidget);
+    view->addLayout(playerLayout);
 
+    window.setLayout(view);
     // showtime!
     window.show();
 
