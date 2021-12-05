@@ -25,7 +25,11 @@
 #include <QImageReader>
 #include <QMessageBox>
 #include <QtCore/QDir>
+#include <QScrollArea>
 #include <QtCore/QDirIterator>
+#include <QLineEdit>
+#include <QObject>
+#include <QLabel>
 #include "the_player.h"
 #include "the_button.h"
 using std::cout; using std::cerr;
@@ -83,6 +87,36 @@ string readFileIntoString(const string& path) {
     return string((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
 }
 
+string getFileName(string filePath, bool withExtension = true, char seperator = '/')
+{
+    // Get last dot position
+    std::size_t dotPos = filePath.rfind('.');
+    std::size_t sepPos = filePath.rfind(seperator);
+    if(sepPos != std::string::npos)
+    {
+        return filePath.substr(sepPos + 1, filePath.size() - (withExtension || dotPos != std::string::npos ? 1 : dotPos) );
+    }
+    return "";
+}
+
+std::vector<TheButtonInfo> filterVideos (std::string search, std::vector<TheButtonInfo> videos) {
+    std::vector<TheButtonInfo> filteredVideos;
+
+    for (int i = 0; i < videos.size(); i++) {
+        string filePath = videos.at(i).url->path().toStdString();
+        string videoName = getFileName(filePath);
+
+        if (videoName.find(search) != string::npos) {
+            filteredVideos.push_back(videos.at(i));
+        }
+    }
+
+    return filteredVideos;
+}
+
+QString getText(QLineEdit *searchInput) {
+    return searchInput->text();
+}
 
 int main(int argc, char *argv[]) {
 
@@ -101,7 +135,7 @@ int main(int argc, char *argv[]) {
     //    file_contents = readFileIntoString(filename);
     //    cout << "file contents: " << file_contents << endl;
 
-        //convert to Qstring for use in TextEdit
+    //convert to Qstring for use in TextEdit
     //    QString qstr = QString::fromStdString(file_contents);
 
     //    istringstream sstream(file_contents);
@@ -140,7 +174,6 @@ int main(int argc, char *argv[]) {
 
     //widget for text beneath player
     QTextEdit *description = new QTextEdit;
-    //    description->setText(qstr);
     description->setReadOnly(true);
 
     // the widget that will show the video
@@ -150,23 +183,65 @@ int main(int argc, char *argv[]) {
     ThePlayer *player = new ThePlayer;
     player->setVideoOutput(videoWidget);
 
-    // a row of buttons
+    //The search on top of displayed videos
+    QLineEdit *searchInput = new QLineEdit();
+    QPushButton *clearButton = new QPushButton();
+    QHBoxLayout *searchBox = new QHBoxLayout();
+    searchInput->setPlaceholderText("Search");
+    clearButton->setText("Clear");
+    // total should be 260, gap is 10
+    clearButton->setMaximumWidth(50);
+    searchInput->setMaximumWidth(200);
+
+    QString searchValue = "";
+
+    // Once clear button is pressed, the text input is set to be empty
+    QObject::connect(clearButton, &QPushButton::clicked, searchInput, &QLineEdit::clear);
+//    QObject::connect(clearButton, &QPushButton::clicked, searchInput, updateSearchValue(searchValue, searchInput));
+
+    // React to changed text
+//    QObject::connect(searchInput, &QLineEdit::textChanged, &searchValue, [&searchValue, &searchInput]()->void{searchValue = getText(searchInput);});
+
+
+    videos = filterVideos(searchValue.toStdString(), videos);
+
+    // Search box is a horizontal layout and it has two widgets: 1) search input 2) clear button
+    searchBox->addWidget(searchInput);
+    searchBox->addWidget(clearButton);
+
+    // a column of buttons
     QWidget *buttonWidget = new QWidget();
     // a list of the buttons
     std::vector<TheButton*> buttons;
-    // the buttons are arranged **vertically
+    // the buttons are arranged vertically
+    QScrollArea *scrollArea= new QScrollArea;
     QVBoxLayout *thumbnailLayout = new QVBoxLayout();
     buttonWidget->setLayout(thumbnailLayout);
 
 
     // create the four buttons
-    for ( int i = 0; i < 6; i++ ) {
+    for ( int i = 0; i < videos.size(); i++ ) {
         TheButton *button = new TheButton(buttonWidget);
-        button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
+        button->connect(button, SIGNAL( jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
         buttons.push_back(button);
+        // Get video name and add it above the video -----
+        string filePath = videos.at(i).url->path().toStdString();
+        string videoName = getFileName(filePath);
+        QLabel *videoTitle = new QLabel();
+        videoTitle->setText(QString::fromStdString(videoName));
+        thumbnailLayout->addWidget(videoTitle);
+        // -----------------------------------------------
+        button->setStyleSheet("margin-bottom: 20px");
         thumbnailLayout->addWidget(button);
         button->init(&videos.at(i));
     }
+
+    scrollArea->setWidget(buttonWidget);
+    scrollArea->setFixedWidth(260);
+
+    QVBoxLayout *videosLayout = new QVBoxLayout();
+    videosLayout->addLayout(searchBox);
+    videosLayout->addWidget(scrollArea);
 
     //right hand side, player and text
     QVBoxLayout *playerLayout = new QVBoxLayout();
@@ -183,7 +258,7 @@ int main(int argc, char *argv[]) {
     window.setMinimumSize(800, 680);
 
     // add the video and the buttons to the top level widget
-    view->addWidget(buttonWidget);
+    view->addLayout(videosLayout);
     view->addLayout(playerLayout);
 
     window.setLayout(view);
