@@ -32,6 +32,7 @@ public:
 
 private slots:
     void clicked();
+    //void onBtnClicked();
 
 signals:
     void jumpTo(TheButtonInfo*);
