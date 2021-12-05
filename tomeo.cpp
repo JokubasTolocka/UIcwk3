@@ -126,25 +126,13 @@ int main(int argc, char *argv[]) {
     // create the Qt Application
     QApplication app(argc, argv);
 
-    string filename("C:\\Users\\miada\\OneDrive\\Documents\\Uni Work\\Year2\\Sem1\\UserInterfaces2811\\metadata.csv");
+    string filename( std::string(argv[1]) + "\\metadata.csv");
     string file_contents;
+    file_contents = readFileIntoString(filename);
 
-    //    std::map<int, std::vector<string>> csv_contents;
-    //    char delimiter = ',';
-
-    //    file_contents = readFileIntoString(filename);
-    //    cout << "file contents: " << file_contents << endl;
-
+    string temp = "Video title, short description, tags";
     //convert to Qstring for use in TextEdit
-    //    QString qstr = QString::fromStdString(file_contents);
-
-    //    istringstream sstream(file_contents);
-    //    //vector of strings
-    //    std::vector<string> items;
-    //    string line1 = "gopro cycling in the alps, mountains";
-    //    string line2 = "panda sanctuary in china, beijing";
-    //    items.push_back(line1);
-    //    items.push_back(line2);
+    QString qtemp = QString::fromStdString(file_contents);
 
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
@@ -174,6 +162,7 @@ int main(int argc, char *argv[]) {
 
     //widget for text beneath player
     QTextEdit *description = new QTextEdit;
+    description->setText(qtemp);
     description->setReadOnly(true);
 
     // the widget that will show the video
@@ -197,10 +186,10 @@ int main(int argc, char *argv[]) {
 
     // Once clear button is pressed, the text input is set to be empty
     QObject::connect(clearButton, &QPushButton::clicked, searchInput, &QLineEdit::clear);
-//    QObject::connect(clearButton, &QPushButton::clicked, searchInput, updateSearchValue(searchValue, searchInput));
+    //    QObject::connect(clearButton, &QPushButton::clicked, searchInput, updateSearchValue(searchValue, searchInput));
 
-    // React to changed text
-//    QObject::connect(searchInput, &QLineEdit::textChanged, &searchValue, [&searchValue, &searchInput]()->void{searchValue = getText(searchInput);});
+    // React to changed text. I NEED TO CHANGE searchValue to be searchInput->text() every time a change occurs
+    //    QObject::connect(searchInput, &QLineEdit::textChanged, &searchValue, [&searchValue, &searchInput]()->void{searchValue = getText(searchInput);});
 
 
     videos = filterVideos(searchValue.toStdString(), videos);
