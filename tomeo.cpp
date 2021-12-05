@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
+#include <QSignalMapper>
 #include "the_player.h"
 #include "the_button.h"
 using std::cout; using std::cerr;
@@ -94,23 +95,14 @@ int main(int argc, char *argv[]) {
     string filename("C:\\Users\\miada\\OneDrive\\Documents\\Uni Work\\Year2\\Sem1\\UserInterfaces2811\\metadata.csv");
     string file_contents;
 
-//    std::map<int, std::vector<string>> csv_contents;
-//    char delimiter = ',';
+    file_contents = readFileIntoString(filename);
 
-//    file_contents = readFileIntoString(filename);
-//    cout << "file contents: " << file_contents << endl;
+    //vector of strings, strings converted to qstring before added
+    //QVector<QString> stringVector(8);
 
+    string temp = "Video title, short description, tags";
     //convert to Qstring for use in TextEdit
-//    QString qstr = QString::fromStdString(file_contents);
-
-//    istringstream sstream(file_contents);
-//    //vector of strings
-//    std::vector<string> items;
-//    string line1 = "gopro cycling in the alps, mountains";
-//    string line2 = "panda sanctuary in china, beijing";
-//    items.push_back(line1);
-//    items.push_back(line2);
-
+    QString qtemp = QString::fromStdString(temp);
 
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
@@ -140,7 +132,7 @@ int main(int argc, char *argv[]) {
 
     //widget for text beneath player
     QTextEdit *description = new QTextEdit;
-//    description->setText(qstr);
+    description->setText(qtemp);
     description->setReadOnly(true);
 
     // the widget that will show the video
@@ -163,8 +155,8 @@ int main(int argc, char *argv[]) {
     for ( int i = 0; i < 7; i++ ) {
         TheButton *button = new TheButton(buttonWidget);
         button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
-        //button->connect(button, SIGNAL(clicked()), description, SLOT(setPlainText(items[i])()));
-        //^this should work, its breaking somewhere else
+        //button->connect(button, SIGNAL(clicked()), description, SLOT(setPlainText(stringVector[i])()));
+        //button->connect(button, SIGNAL(clicked()), description, SLOT(onBtnClicked()));
         buttons.push_back(button);
         thumbnailLayout->addWidget(button);
         button->init(&videos.at(i));
@@ -174,7 +166,6 @@ int main(int argc, char *argv[]) {
     QVBoxLayout *playerLayout = new QVBoxLayout();
     playerLayout->addWidget(videoWidget);
     playerLayout->addWidget(description);
-
 
     // tell the player what buttons and videos are available
     player->setContent(&buttons, & videos);
