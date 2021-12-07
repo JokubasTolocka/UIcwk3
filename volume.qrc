@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/volume.png</file>
+    </qresource>
+</RCC>

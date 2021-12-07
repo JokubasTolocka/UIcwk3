@@ -11,12 +11,26 @@ void ThePlayer::setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo
     jumpTo(buttons -> at(0) -> info);
 }
 
-//// change the image and video for one button every one second
+// change the image and video for one button every one second
 //void ThePlayer::shuffle() {
 //    TheButtonInfo* i = & infos -> at (rand() % infos->size() );
-////        setMedia(*i->url);
+//        setMedia(*i->url);
 //    buttons -> at( updateCount++ % buttons->size() ) -> init( i );
 //}
+
+//self made signals for next/previous, if these are removed for some reason the program just doesnt work
+//the only issues with next and previous is making a playlist that would fit the way the program
+//is already implemented. otherwise the signals and slots in tomeo.cpp will work
+
+void ThePlayer::next() {
+    //TheButtonInfo* i = & infos -> at (1);
+    //setMedia(*i->url);
+}
+
+void ThePlayer::previous() {
+
+}
+
 
 void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
     switch (ms) {

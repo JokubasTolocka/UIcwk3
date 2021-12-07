@@ -30,6 +30,7 @@
 #include <QLineEdit>
 #include <QObject>
 #include <QLabel>
+#include <QSlider>
 #include "the_player.h"
 #include "the_button.h"
 using std::cout; using std::cerr;
@@ -43,7 +44,6 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
     std::vector<TheButtonInfo> out =  std::vector<TheButtonInfo>();
     QDir dir(QString::fromStdString(loc) );
     QDirIterator it(dir);
-
     while (it.hasNext()) { // for all files
 
         QString f = it.next();
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     // create the Qt Application
     QApplication app(argc, argv);
 
-    string filename( std::string(argv[1]) + "\\metadata.csv");
+    string filename( std::string(argv[1]) + "//metadata.csv");
     string file_contents;
     file_contents = readFileIntoString(filename);
 
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     std::vector<TheButtonInfo> videos;
 
     if (argc == 2)
-        videos = getInfoIn( std::string(argv[1]) );
+        videos = getInfoIn( std::string(argv[1]));
 
     if (videos.size() == 0) {
 
@@ -164,6 +164,7 @@ int main(int argc, char *argv[]) {
     QTextEdit *description = new QTextEdit;
     description->setText(qtemp);
     description->setReadOnly(true);
+    description->setMaximumHeight(70);
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
@@ -171,6 +172,48 @@ int main(int argc, char *argv[]) {
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer;
     player->setVideoOutput(videoWidget);
+
+
+    //the button bar resting below the video, all widgets within it
+    QHBoxLayout *controls = new QHBoxLayout();
+    QPushButton *pause = new QPushButton();
+    QPushButton *play = new QPushButton();
+    QSlider *videoslider = new QSlider(Qt::Horizontal);
+    QSlider *volumeslider = new QSlider(Qt::Horizontal);
+    QPushButton *volumeicon = new QPushButton();
+
+    //adding relevant widgets to control bar, with appropriate settings
+
+    pause->setMaximumWidth(40);
+    pause->setIcon(QIcon(":/icons/pause.png"));
+    QObject::connect(pause, &QPushButton::released, player, &ThePlayer::pause);
+    controls->addWidget(pause);
+    play->setMaximumWidth(40);
+    play->setIcon(QIcon(":/icons/play.png"));
+    QObject::connect(play, &QPushButton::released, player, &ThePlayer::play);
+    controls->addWidget(play);
+    // found out the issue with below linem, incompatible types and not enough args in signal
+    //QObject::connect(player, SIGNAL(durationChanged(qint64)), player, SLOT(setRange(int,int)));
+    videoslider->setMinimumWidth(description->width()-280);
+    controls->addWidget(videoslider);
+    volumeicon->setMaximumWidth(40);
+    volumeicon->setIcon(QIcon(":/icons/volume.png"));
+    controls->addWidget(volumeicon);
+    volumeslider->setMinimumWidth(160);
+    volumeslider->setMaximumWidth(160);
+    QObject::connect(volumeslider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
+    controls->addWidget(volumeslider);
+
+    // below is the code for the next and previous buttons, non-functional
+
+    //QPushButton *prevvid = new QPushButton();
+    //QPushButton *nextvid = new QPushButton();
+    //prevvid->setMaximumWidth(40);
+    //QObject::connect(prevvid, &QPushButton::released, player, &ThePlayer::previous);
+    //controls->addWidget(prevvid);
+    //nextvid->setMaximumWidth(40);
+    //QObject::connect(nextvid, &QPushButton::released, player, &ThePlayer::next);
+    //controls->addWidget(nextvid);
 
     //The search on top of displayed videos
     QLineEdit *searchInput = new QLineEdit();
@@ -235,6 +278,7 @@ int main(int argc, char *argv[]) {
     //right hand side, player and text
     QVBoxLayout *playerLayout = new QVBoxLayout();
     playerLayout->addWidget(videoWidget);
+    playerLayout->addLayout(controls);
     playerLayout->addWidget(description);
 
     // tell the player what buttons and videos are available

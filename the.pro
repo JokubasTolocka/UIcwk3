@@ -10,14 +10,19 @@ CONFIG += c++11
 SOURCES += \
         the_button.cpp \
         the_player.cpp \
-        tomeo.cpp
+        tomeo.cpp \
 
 HEADERS += \
     the_button.h \
-    the_player.h
+    the_player.h \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    pause.qrc \
+    play.qrc \
+    volume.qrc
 
