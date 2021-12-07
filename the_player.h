@@ -40,10 +40,13 @@ private slots:
 
     // change the image and video for one button every one second
 //    void shuffle();
-
     void playStateChanged (QMediaPlayer::State ms);
 
 public slots:
+
+    //self made signals
+    void next();
+    void previous();
 
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
