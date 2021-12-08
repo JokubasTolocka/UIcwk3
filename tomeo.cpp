@@ -204,6 +204,13 @@ int main(int argc, char *argv[]) {
     QObject::connect(volumeslider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     controls->addWidget(volumeslider);
 
+    // add fast-forward button
+   QPushButton *fastForward = new QPushButton();
+   fastForward->setIcon(QIcon(":/icons/fastforward.png"));
+   fastForward->setMaximumWidth(40);
+   QObject::connect(fastForward, SIGNAL(released()), player, SLOT(skipTime()));
+   controls->addWidget(fastForward);
+
     // below is the code for the next and previous buttons, non-functional
 
     //QPushButton *prevvid = new QPushButton();

@@ -48,6 +48,8 @@ public slots:
     void next();
     void previous();
 
+    void skipTime();
+
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
 };

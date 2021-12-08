@@ -31,6 +31,14 @@ void ThePlayer::previous() {
 
 }
 
+void ThePlayer::skipTime() {
+   qint64 newPosition = position() + (qint64) 5000;
+   if (newPosition > duration())
+       newPosition = duration();
+
+   setPosition(newPosition);
+}
+
 
 void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
     switch (ms) {
