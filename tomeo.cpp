@@ -34,6 +34,7 @@
 #include "the_player.h"
 #include "the_button.h"
 #include "videoslider.h"
+#include "playbackspeedselector.h"
 
 using std::cout; using std::cerr;
 using std::endl; using std::string;
@@ -220,6 +221,10 @@ int main(int argc, char *argv[]) {
     QObject::connect(volumeslider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     controls->addWidget(volumeslider);
 
+    PlaybackSpeedSelector *psSelector = new PlaybackSpeedSelector();
+    psSelector->setMaximumWidth(80);
+    QObject::connect(psSelector, SIGNAL(speedChanged(qreal)), player, SLOT(setPlaybackRate(qreal)));
+    controls->addWidget(psSelector);
 
     // below is the code for the next and previous buttons, non-functional
 
