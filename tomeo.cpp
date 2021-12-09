@@ -33,6 +33,8 @@
 #include <QSlider>
 #include "the_player.h"
 #include "the_button.h"
+#include "videoslider.h"
+
 using std::cout; using std::cerr;
 using std::endl; using std::string;
 using std::ifstream; using std::ostringstream;
@@ -178,7 +180,7 @@ int main(int argc, char *argv[]) {
     QHBoxLayout *controls = new QHBoxLayout();
     QPushButton *pause = new QPushButton();
     QPushButton *play = new QPushButton();
-    QSlider *videoslider = new QSlider(Qt::Horizontal);
+    QSlider *videoslider = new VideoSlider(Qt::Horizontal);
     QSlider *volumeslider = new QSlider(Qt::Horizontal);
     QPushButton *volumeicon = new QPushButton();
 
@@ -192,9 +194,23 @@ int main(int argc, char *argv[]) {
     play->setIcon(QIcon(":/icons/play.png"));
     QObject::connect(play, &QPushButton::released, player, &ThePlayer::play);
     controls->addWidget(play);
+
+    // add fast-forward button
+   QPushButton *fastForward = new QPushButton();
+   fastForward->setIcon(QIcon(":/icons/fastforward.png"));
+   fastForward->setMaximumWidth(40);
+   QObject::connect(fastForward, SIGNAL(released()), player, SLOT(skip5seconds()));
+   controls->addWidget(fastForward);
+
     // found out the issue with below linem, incompatible types and not enough args in signal
     //QObject::connect(player, SIGNAL(durationChanged(qint64)), player, SLOT(setRange(int,int)));
     videoslider->setMinimumWidth(description->width()-280);
+//    videoslider->setRange(0, 1000);
+//    videoslider->setTickInterval(1);
+    QObject::connect(videoslider, SIGNAL(positionChanged(qint64)), player, SLOT(changePosition(qint64)));
+    QObject::connect(player, SIGNAL(durationChanged(qint64)), videoslider, SLOT(setMaxRange(qint64)));
+    QObject::connect(player, SIGNAL(positionChanged(qint64)), videoslider, SLOT(setPosition(qint64)));
+
     controls->addWidget(videoslider);
     volumeicon->setMaximumWidth(40);
     volumeicon->setIcon(QIcon(":/icons/volume.png"));
@@ -204,12 +220,6 @@ int main(int argc, char *argv[]) {
     QObject::connect(volumeslider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     controls->addWidget(volumeslider);
 
-    // add fast-forward button
-   QPushButton *fastForward = new QPushButton();
-   fastForward->setIcon(QIcon(":/icons/fastforward.png"));
-   fastForward->setMaximumWidth(40);
-   QObject::connect(fastForward, SIGNAL(released()), player, SLOT(skipTime()));
-   controls->addWidget(fastForward);
 
     // below is the code for the next and previous buttons, non-functional
 

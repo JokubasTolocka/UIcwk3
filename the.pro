@@ -11,10 +11,12 @@ SOURCES += \
         the_button.cpp \
         the_player.cpp \
         tomeo.cpp \
+    videoslider.cpp
 
 HEADERS += \
     the_button.h \
     the_player.h \
+    videoslider.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -21,12 +21,12 @@ private:
     std::vector<TheButton*>* buttons;
     QTimer* mTimer;
     long updateCount = 0;
+    qint64 videoDuration = -1;
 
 public:
     ThePlayer() : QMediaPlayer(NULL) {
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
-
         mTimer = new QTimer(NULL);
         mTimer->setInterval(1000); // 1000ms is one second between ...
         mTimer->start();
@@ -42,16 +42,19 @@ private slots:
 //    void shuffle();
     void playStateChanged (QMediaPlayer::State ms);
 
+
 public slots:
 
     //self made signals
     void next();
     void previous();
 
-    void skipTime();
+    void skip5seconds();
+    void changePosition(qint64);
 
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
+
 };
 
 #endif //CW2_THE_PLAYER_H

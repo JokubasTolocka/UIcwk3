@@ -3,6 +3,7 @@
 //
 
 #include "the_player.h"
+#include <cmath>
 
 // all buttons have been setup, store pointers here
 void ThePlayer::setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo>* i) {
@@ -31,7 +32,7 @@ void ThePlayer::previous() {
 
 }
 
-void ThePlayer::skipTime() {
+void ThePlayer::skip5seconds() {
    qint64 newPosition = position() + (qint64) 5000;
    if (newPosition > duration())
        newPosition = duration();
@@ -39,6 +40,9 @@ void ThePlayer::skipTime() {
    setPosition(newPosition);
 }
 
+void ThePlayer::changePosition(qint64 pos) {
+    setPosition(pos);
+}
 
 void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
     switch (ms) {
@@ -51,6 +55,7 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 }
 
 void ThePlayer::jumpTo (TheButtonInfo* button) {
+    videoDuration = -1;
     setMedia( * button -> url);
     play();
 }
