@@ -169,6 +169,10 @@ int main(int argc, char *argv[]) {
     description->setReadOnly(true);
     description->setMaximumHeight(70);
 
+    QPalette pal = QPalette();
+    pal.setColor(QPalette::Window, QColor(0,128,128,255));
+    description->setPalette(pal);
+
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
 
@@ -184,6 +188,8 @@ int main(int argc, char *argv[]) {
     QSlider *videoslider = new VideoSlider(Qt::Horizontal);
     QSlider *volumeslider = new QSlider(Qt::Horizontal);
     QPushButton *volumeicon = new QPushButton();
+    QPushButton *fullscreen = new QPushButton();
+
 
     //adding relevant widgets to control bar, with appropriate settings
 
@@ -220,6 +226,12 @@ int main(int argc, char *argv[]) {
     volumeslider->setMaximumWidth(160);
     QObject::connect(volumeslider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     controls->addWidget(volumeslider);
+
+    //add fullscreen button
+    fullscreen->setMaximumWidth(40);
+    fullscreen->setIcon(QIcon(":/icons/fullscreen.png"));
+    QObject::connect(fullscreen, SIGNAL(clicked()), player, SLOT(showFullSscreen()));
+    controls->addWidget(fullscreen);
 
     PlaybackSpeedSelector *psSelector = new PlaybackSpeedSelector();
     psSelector->setMaximumWidth(80);
@@ -265,6 +277,7 @@ int main(int argc, char *argv[]) {
 
     // a column of buttons
     QWidget *buttonWidget = new QWidget();
+    buttonWidget->setPalette(pal);
     // a list of the buttons
     std::vector<TheButton*> buttons;
     // the buttons are arranged vertically
@@ -296,6 +309,7 @@ int main(int argc, char *argv[]) {
     QVBoxLayout *videosLayout = new QVBoxLayout();
     videosLayout->addLayout(searchBox);
     videosLayout->addWidget(scrollArea);
+    scrollArea->setPalette(pal);
 
     //right hand side, player and text
     QVBoxLayout *playerLayout = new QVBoxLayout();
@@ -319,6 +333,9 @@ int main(int argc, char *argv[]) {
     window.setLayout(view);
 
     // showtime!
+    QPalette pal2 = QPalette();
+    pal2.setColor(QPalette::Window, QColor(0,51,51,255));
+    window.setPalette(pal2);
     window.show();
 
     // wait for the app to terminate

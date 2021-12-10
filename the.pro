@@ -27,6 +27,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     fastforward.qrc \
+    fullscreen.qrc \
     pause.qrc \
     play.qrc \
     volume.qrc
