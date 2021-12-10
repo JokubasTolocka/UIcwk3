@@ -227,11 +227,7 @@ int main(int argc, char *argv[]) {
     QObject::connect(volumeslider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     controls->addWidget(volumeslider);
 
-    //add fullscreen button
-    fullscreen->setMaximumWidth(40);
-    fullscreen->setIcon(QIcon(":/icons/fullscreen.png"));
-    QObject::connect(fullscreen, SIGNAL(clicked()), player, SLOT(showFullSscreen()));
-    controls->addWidget(fullscreen);
+
 
     PlaybackSpeedSelector *psSelector = new PlaybackSpeedSelector();
     psSelector->setMaximumWidth(80);
@@ -321,22 +317,28 @@ int main(int argc, char *argv[]) {
     player->setContent(&buttons, & videos);
 
     // create the main window and layout
-    QWidget window;
+    QWidget *window = new QWidget();
     QHBoxLayout *view = new QHBoxLayout();
-    window.setWindowTitle("tomeo");
-    window.setMinimumSize(800, 680);
+    window->setWindowTitle("tomeo");
+    window->setMinimumSize(800, 680);
+
+    //add fullscreen button
+    fullscreen->setMaximumWidth(40);
+    fullscreen->setIcon(QIcon(":/icons/fullscreen.png"));
+    QObject::connect(fullscreen, SIGNAL(clicked()), window, SLOT(showFullScreen()));
+    controls->addWidget(fullscreen);
 
     // add the video and the buttons to the top level widget
     view->addLayout(videosLayout);
     view->addLayout(playerLayout);
 
-    window.setLayout(view);
+    window->setLayout(view);
 
     // showtime!
     QPalette pal2 = QPalette();
     pal2.setColor(QPalette::Window, QColor(0,51,51,255));
-    window.setPalette(pal2);
-    window.show();
+    window->setPalette(pal2);
+    window->show();
 
     // wait for the app to terminate
     return app.exec();
